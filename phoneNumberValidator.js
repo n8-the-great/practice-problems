@@ -32,41 +32,58 @@ function telephoneCheck(str) {
   // if not valid, return false
   let colinecode = str.substring(str.length-8, str.length);
   let regexLineCode = /^([-) \d]?)(\d{3})([- \d])?(\d{4})$/;
-  console.log(colinecode);
+  // console.log(colinecode);
   if (!regexLineCode.test(colinecode)) {
     return false;
   }
 
-  // update string and remove lineCode
-  str = str.substring(0, str.length - 4);
-  // console.log(str);
+  // update string -> remove central office code and line code
+  // if 5th from end is a digit, phone number format should be \d{7}
+  if(/\d/.test(str[str.length - 5])) {
+    str = str.substring(0, str.length - 7);
+  } else {
+    str = str.substring(0, str.length - 8);
+  };
+  // console.log('remaining str: ' + str);
+  // console.log(str[str.length - 1]);
+  // possibilities: remaining str ends with ), -, empty space, and/or num
+  if (str[str.length - 1] === ' ' || str[str.length - 1] === '-') {
+    // if empty space, continue.  if -, no ) is allowed before it
+    if (str[str.length - 1] === ' ') {
+      str = str.substring(0, str.length - 1);
+    } else if (str[str.length - 1] === '-') {
+      if (str[str.length - 2] === ')') {
+        return false;
+      }
+      str = str.substring(0, str.length - 1);
+    }
+    // two in a row not allowed
+    if (str[str.length - 1] === ' ' || str[str.length - 1] === '-') {
+      return false;
+    }
+  }
+  console.log('remaining str: ' + str);
+
+  // test for close parens, and if found, test for open parens -3 positions.
+  // was not able to figure out a single regex for this
 
 
 
-
-  // ^(1)?([-\s])?([2-9])(\d{2})$ up to area code.
-  // how to add optional braces, but if one is present, both need to be present
-  let regexCountryCode = /^(1)?$/
-  let regexAreaCode = /^([2-9])(\d{2})$/;
-  let regexCOCode = /^(\d{3})$/; //central office code
+  // test area code
 
 
-  let regexTest = /\w/;
+  // test county code
 
 
-  // str = "T";
 
-
-  // return regexTest.test(str);
-  // return str.match(regexTest);
   return true;
 }
 
-
-let test1 = '(452)2345678';
-let test2 = '(322)215-3678';
-let test3 = '(452) 234-5678';
-let test4 = '(322) 234 5678';
+// unit testing
+let test1 = '1(452)2345678';
+let test2 = '1(322) 2153678';
+let test3 = '1 (452) 234-5678';
+let test4 = '1-322 234 5678';
 
 console.log(`${test1} shoud be T: ${telephoneCheck(test1)}`);
 console.log(`${test2} should be T: ${telephoneCheck(test2)}`);
@@ -74,15 +91,15 @@ console.log(`${test3} shoud be T: ${telephoneCheck(test3)}`);
 console.log(`${test4} should be T: ${telephoneCheck(test4)}`);
 
 
-test1 = '(452)234+5678';
-test2 = '(322) 215678';
-test3 = '(452) 234x5678';
-test4 = '(322)234  5678';
+// test1 = '(452)234+5678';
+// test2 = '(322) 215678';
+// test3 = '(452) 234x5678';
+// test4 = '(322)234  5678';
 
-console.log(`${test1} shoud be F: ${telephoneCheck(test1)}`);
-console.log(`${test2} should be F: ${telephoneCheck(test2)}`);
-console.log(`${test3} shoud be F: ${telephoneCheck(test3)}`);
-console.log(`${test4} should be F: ${telephoneCheck(test4)}`);
+// console.log(`${test1} shoud be F: ${telephoneCheck(test1)}`);
+// console.log(`${test2} should be F: ${telephoneCheck(test2)}`);
+// console.log(`${test3} shoud be F: ${telephoneCheck(test3)}`);
+// console.log(`${test4} should be F: ${telephoneCheck(test4)}`);
 
 
 
